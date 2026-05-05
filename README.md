@@ -113,3 +113,8 @@ python3 uni.py
 - User-friendly navigation with back functionality
 - Input validation and error handling
 - Clean formatted output for readability
+
+---
+
+## Team
+Somesh Shanbhag, Kelly Jia Yi Beh, Madhava Kumar Ravi & Sahil Uppal
