@@ -56,6 +56,37 @@ class Subject:
         return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>2} ]"
 
 # ==========================================
+# PART 3: UTILITIES
+# ==========================================
+
+def validate_email(email):
+    pattern = r"^[a-zA-Z0-9_.+-]+@student\.uni\.edu\.au$"
+    if re.match(pattern, email):
+        return True
+    return False
+
+def validate_password(password):
+    if len(password) < 8:
+        return False
+    if password[0].isupper() == False:
+        return False
+
+    letters = re.findall(r"[a-zA-Z]", password)
+    if len(letters) < 5:
+        return False
+
+    if password[-3:].isdigit() == False:
+        return False
+
+    return True
+
+def sync_student_to_file(current_student):
+    all_students = Database.load_all_students()
+    for i in range(len(all_students)):
+        if all_students[i].id == current_student.id:
+            all_students[i] = current_student
+            break
+    Database.save_all_students(all_students)
 # PART 5: VIEW (GUI)
 # ==========================================
 
