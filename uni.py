@@ -56,6 +56,28 @@ class Subject:
         return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>2} ]"
 
 # ==========================================
+# PART 6: MAIN
+# ==========================================
+
+if __name__ == "__main__":
+    while True:
+        print("\n======================")
+        print("Start (1) CLI, (2) GUI")
+
+        print("\n--- Add-Ons ---")
+        print("(3) Generate Test Data")
+        print("(4) Read Database")
+        print("(5) Clear Database")
+        print("(X) Exit")
+
+        mode = input("==========> Select option: ").strip().lower()
+
+        if mode == "x":
+            print("Exiting...")
+            break
+
+        else:
+            print("Invalid option.")
 # PART 3: UTILITIES
 # ==========================================
 
