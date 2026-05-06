@@ -116,6 +116,44 @@ def sync_student_to_file(current_student):
             break
     Database.save_all_students(all_students)
 
+def generate_test_data():
+    existing = Database.load_all_students()
+
+    if len(existing) > 0:
+        print()
+        print("Database already has data. Overwriting...")
+
+    s1 = Student("Somesh", "somesh@student.uni.edu.au", "Paaaa123")
+    s2 = Student("Kelly", "kelly@student.uni.edu.au", "Paaaa123")
+    s3 = Student("Madhava", "madhava@student.uni.edu.au", "Paaaa123")
+    s4 = Student("Sahil", "sahil@student.uni.edu.au", "Secure123")
+
+    s1.subjects.append(Subject())
+    s1.subjects.append(Subject())
+
+    s2.subjects.append(Subject())
+
+    s3.subjects.append(Subject())
+    s3.subjects.append(Subject())
+
+    s4.subjects.append(Subject())
+
+    Database.save_all_students([s1, s2, s3, s4])
+
+    print(" ✅ Test data saved to students.data")
+    students = Database.load_all_students()
+    print("Number of students:", len(students))
+
+def read_database():
+    students = Database.load_all_students()
+    print("Number of students:", len(students))
+    for s in students:
+        print("-", s.name, s.email)
+
+def clear_database():
+    Database.clear_all_students()
+    print("Database cleared.")
+
 # ==========================================
 # PART 4: CONTROLLER (CLI)
 # ==========================================
