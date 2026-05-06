@@ -56,28 +56,34 @@ class Subject:
         return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>2} ]"
 
 # ==========================================
-# PART 6: MAIN
+# PART 2: DATABASE TOOLS
 # ==========================================
 
-if __name__ == "__main__":
-    while True:
-        print("\n======================")
-        print("Start (1) CLI, (2) GUI")
+class Database:
+    FILE_NAME = "students.data"
 
-        print("\n--- Add-Ons ---")
-        print("(3) Generate Test Data")
-        print("(4) Read Database")
-        print("(5) Clear Database")
-        print("(X) Exit")
+    @staticmethod
+    def save_all_students(students_list):
+        with open(Database.FILE_NAME, "wb") as f:
+            pickle.dump(students_list, f)
 
-        mode = input("==========> Select option: ").strip().lower()
+    @staticmethod
+    def load_all_students():
+        if not os.path.exists(Database.FILE_NAME):
+            Database.save_all_students([])
+            return []
 
-        if mode == "x":
-            print("Exiting...")
-            break
+        try:
+            with open(Database.FILE_NAME, "rb") as f:
+                return pickle.load(f)
+        except:
+            return []
 
-        else:
-            print("Invalid option.")
+    @staticmethod
+    def clear_all_students():
+        Database.save_all_students([])
+
+# ==========================================
 # PART 3: UTILITIES
 # ==========================================
 
@@ -109,6 +115,15 @@ def sync_student_to_file(current_student):
             all_students[i] = current_student
             break
     Database.save_all_students(all_students)
+
+# ==========================================
+# PART 4: CONTROLLER (CLI)
+# ==========================================
+
+class CLIUniApp:
+    pass
+
+# ==========================================
 # PART 5: VIEW (GUI)
 # ==========================================
 
@@ -229,30 +244,27 @@ class GUIUniApp:
             messagebox.showinfo("Success", "Password updated successfully")
         else:
             messagebox.showerror("Error", "Passwords do not match or invalid format")
-            
-# PART 2: DATABASE TOOLS
+
+# ==========================================
+# PART 6: MAIN
 # ==========================================
 
-class Database:
-    FILE_NAME = "students.data"
+if __name__ == "__main__":
+    while True:
+        print("\n======================")
+        print("Start (1) CLI, (2) GUI")
 
-    @staticmethod
-    def save_all_students(students_list):
-        with open(Database.FILE_NAME, "wb") as f:
-            pickle.dump(students_list, f)
+        print("\n--- Add-Ons ---")
+        print("(3) Generate Test Data")
+        print("(4) Read Database")
+        print("(5) Clear Database")
+        print("(X) Exit")
 
-    @staticmethod
-    def load_all_students():
-        if not os.path.exists(Database.FILE_NAME):
-            Database.save_all_students([])
-            return []
+        mode = input("==========> Select option: ").strip().lower()
 
-        try:
-            with open(Database.FILE_NAME, "rb") as f:
-                return pickle.load(f)
-        except:
-            return []
+        if mode == "x":
+            print("Exiting...")
+            break
 
-    @staticmethod
-    def clear_all_students():
-        Database.save_all_students([])
+        else:
+            print("Invalid option.")
