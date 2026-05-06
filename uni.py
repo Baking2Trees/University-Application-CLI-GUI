@@ -55,3 +55,30 @@ class Subject:
     def __str__(self):
         return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>2} ]"
 
+# ==========================================
+# PART 2: DATABASE TOOLS
+# ==========================================
+
+class Database:
+    FILE_NAME = "students.data"
+
+    @staticmethod
+    def save_all_students(students_list):
+        with open(Database.FILE_NAME, "wb") as f:
+            pickle.dump(students_list, f)
+
+    @staticmethod
+    def load_all_students():
+        if not os.path.exists(Database.FILE_NAME):
+            Database.save_all_students([])
+            return []
+
+        try:
+            with open(Database.FILE_NAME, "rb") as f:
+                return pickle.load(f)
+        except:
+            return []
+
+    @staticmethod
+    def clear_all_students():
+        Database.save_all_students([])
