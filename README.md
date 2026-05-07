@@ -97,7 +97,7 @@ python3 uni.py
 - Login for students (without admin options)  
   *(PS: login button is also bound to the Enter key)*  
 - Max four subject enrolments for logged-in students  
-- Exception handling for:
+- GUI exception handling for:
   - Empty login fields  
   - Incorrect student credentials  
   - Incorrect email format  
@@ -106,11 +106,22 @@ python3 uni.py
 
 ---
 
+## Code Quality
+- The project was refined using pylint checks and achieved a final pylint score of `10.00 / 10`.
+
+---
+
 ## Key Highlights
 - Dual interface: CLI + GUI
 - Persistent storage using file-based database (`pickle`)
 - User-friendly navigation with back functionality
 - Input validation and error handling
+- Additional handling for:
+  - invalid menu input
+  - invalid subject ID when removing subjects
+  - invalid password confirmation
+  - maximum 4 subject enrolments in CLI and GUI
+  - missing or unreadable `students.data` fallback
 - Clean formatted output for readability
 
 ---
