@@ -1,3 +1,7 @@
+"""University Application CLI and GUI system."""
+# pylint: disable=missing-class-docstring,missing-function-docstring,too-few-public-methods,broad-exception-caught,no-else-return
+
+import sys
 import random
 import re
 import pickle
@@ -54,7 +58,6 @@ class Subject:
 
     def __str__(self):
         return f"[ Subject::{self.id} -- mark = {self.mark} -- grade = {self.grade:>2} ]"
-
 # ==========================================
 # PART 2: DATABASE TOOLS
 # ==========================================
@@ -76,7 +79,8 @@ class Database:
         try:
             with open(Database.FILE_NAME, "rb") as f:
                 return pickle.load(f)
-        except:
+        except Exception:
+            print("Database file could not be loaded. Starting with empty data.")
             return []
 
     @staticmethod
@@ -96,22 +100,22 @@ def validate_email(email):
 def validate_password(password):
     if len(password) < 8:
         return False
-    if password[0].isupper() == False:
+    if not password[0].isupper():
         return False
 
     letters = re.findall(r"[a-zA-Z]", password)
     if len(letters) < 5:
         return False
 
-    if password[-3:].isdigit() == False:
+    if not password[-3:].isdigit():
         return False
 
     return True
 
 def sync_student_to_file(current_student):
     all_students = Database.load_all_students()
-    for i in range(len(all_students)):
-        if all_students[i].id == current_student.id:
+    for i, student in enumerate(all_students):
+        if student.id == current_student.id:
             all_students[i] = current_student
             break
     Database.save_all_students(all_students)
@@ -172,14 +176,14 @@ class CLIUniApp:
             print("(S) Student Subsystem")
             print("(X) Exit Application")
             choice = input("==========> System Select: ").strip().lower()
-            
+
             if choice == "a":
                 self.admin_menu()
             elif choice == "s":
                 self.student_subsystem()
             elif choice == "x":
                 print("Exiting... Thank You.")
-                exit()
+                sys.exit()
             else:
                 print("Invalid option.")
 
@@ -212,7 +216,9 @@ class CLIUniApp:
                 break
             elif choice == "x":
                 print("Exiting application...")
-                exit()
+                sys.exit()
+            else:
+                print("Invalid option.")
 
     def view_all_students(self):
         print("")
@@ -252,7 +258,7 @@ class CLIUniApp:
             groups[grade].append(
                 f"{s.name} :: {s.id} --> GRADE: {grade} - MARK: {avg:.2f}"
             )
-        
+
         order = ["HD", "D", "C", "P", "Z"]
 
         for g in order:
@@ -266,14 +272,14 @@ class CLIUniApp:
         found = False
         for s in self.students:
             if s.id == sid:
-                confirm = input("Are you sure? (y/n): ")
+                confirm = input("Are you sure? (y/n): ").strip().lower()
                 if confirm == "y":
                     self.students.remove(s)
                     Database.save_all_students(self.students)
                     print("Removing Student " + sid + " Account...")
                 found = True
                 break
-        if found == False:
+        if not found:
             print("Student " + sid + " does not exist")
 
     def clear_database(self):
@@ -296,7 +302,7 @@ class CLIUniApp:
                 self.register_student()
             elif choice == "l":
                 logged_in = self.login_student()
-                if logged_in != None:
+                if logged_in is not None:
                     print("")
                     print("Student logged in successfully!")
                     self.student_course_menu(logged_in)
@@ -304,7 +310,9 @@ class CLIUniApp:
                 break
             elif choice == "x":
                 print("Exiting application...")
-                exit()
+                sys.exit()
+            else:
+                print("Invalid option.")
 
     def register_student(self):
         print("")
@@ -315,7 +323,7 @@ class CLIUniApp:
 
         # 1: Validate format
         if not (validate_email(email) and validate_password(password)):
-            print("Incorrect email or password format")
+            print("Incorrect email or password format. Please try again.")
             return
 
         # 2: Check for duplicates
@@ -371,7 +379,9 @@ class CLIUniApp:
                 break
             elif choice == "x":
                 print("Exiting application...")
-                exit()
+                sys.exit()
+            else:
+                print("Invalid option.")
 
     def enrol_subject(self, student):
         if len(student.subjects) >= 4:
@@ -393,7 +403,7 @@ class CLIUniApp:
                 print("Dropping Subject-" + sid)
                 found = True
                 break
-        if found == False:
+        if not found:
             print("Subject not found")
 
     def view_enrolments(self, student):
@@ -404,15 +414,12 @@ class CLIUniApp:
     def change_password(self, student):
         new_p = input("New Password: ")
         conf_p = input("Confirm Password: ")
-        if new_p == conf_p and validate_password(new_p) == True:
+        if new_p == conf_p and validate_password(new_p):
             student.password = new_p
             sync_student_to_file(student)
             print("Password updated successfully")
         else:
             print("Passwords do not match or invalid format")
-
-class CLIUniApp:
-    pass
 
 # ==========================================
 # PART 5: VIEW (GUI)
@@ -468,15 +475,24 @@ class GUIUniApp:
             messagebox.showerror("Error", "Fields cannot be empty")
             return
 
+        if not validate_email(email):
+            messagebox.showerror("Error", "Incorrect email format")
+            return
+
         students = Database.load_all_students()
+
         for s in students:
             if s.email == email and s.password == pwd:
                 self.current_student = s
                 self.show_enrol_screen()
                 return
+
         messagebox.showerror("Error", "Invalid credentials")
 
     def show_enrol_screen(self):
+        # unbind 'Enter' after login screen
+        self.root.unbind("<Return>")
+
         self.clear_screen()
         tk.Label(self.root, text="Welcome " + self.current_student.name).pack(pady=10)
 
@@ -506,11 +522,11 @@ class GUIUniApp:
         else:
             for sub in self.current_student.subjects:
                 tk.Label(sub_win, text=str(sub)).pack()
-  
+
     def remove_subject(self):
         sid = simpledialog.askstring("Remove Subject", "Enter Subject ID:")
 
-        if sid == None:
+        if sid is None:
             return
 
         for sub in self.current_student.subjects:
@@ -521,12 +537,12 @@ class GUIUniApp:
                 return
 
         messagebox.showerror("Error", "Subject not found")
-            
+
     def change_password(self):
         new_p = simpledialog.askstring("Change Password", "New Password:", show="*")
         conf_p = simpledialog.askstring("Change Password", "Confirm Password:", show="*")
 
-        if new_p == None or conf_p == None:
+        if new_p is None or conf_p is None:
             return
 
         if new_p == conf_p and validate_password(new_p):
@@ -560,7 +576,7 @@ if __name__ == "__main__":
             try:
                 app = GUIUniApp()
                 app.root.mainloop()
-            except:
+            except Exception:
                 print("GUI closed.")
 
         elif mode == "3":
