@@ -13,18 +13,17 @@ A local university system developed using both CLI and GUI interfaces. The appli
 
 1. Make sure Python 3 is installed.
 
-2. Open the project folder in a terminal.
-
-3. Run the program:
+2. Clone this repository and run the program accordingly:
 
 ```bash
+git clone https://github.com/Baking2Trees/University-Application-CLI-GUI.git
+cd University-Application-CLI-GUI
 python3 uni.py
 ```
+3. Choose an option from the menu:
 
-4. Choose an option from the menu:
-
-- (a) CLI version → follow the menu prompts  
-- (b) GUI version → interact using buttons and input fields  
+- (1) CLI version → follow the menu prompts  
+- (2) GUI version → interact using buttons and input fields  
 
 *Optional: Use test data if needed for demonstration.*
 
