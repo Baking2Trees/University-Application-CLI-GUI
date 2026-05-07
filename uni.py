@@ -159,6 +159,259 @@ def clear_database():
 # ==========================================
 
 class CLIUniApp:
+    def __init__(self):
+        self.students = Database.load_all_students()
+
+    def run(self):
+        while True:
+            print("")
+            print("=============================================")
+            print("      UNIVERSITY SYSTEM MAIN MENU")
+            print("=============================================")
+            print("(A) Admin Subsystem")
+            print("(S) Student Subsystem")
+            print("(X) Exit Application")
+            choice = input("==========> System Select: ").strip().lower()
+            
+            if choice == "a":
+                self.admin_menu()
+            elif choice == "s":
+                self.student_subsystem()
+            elif choice == "x":
+                print("Exiting... Thank You.")
+                exit()
+            else:
+                print("Invalid option.")
+
+    def admin_menu(self):
+        while True:
+            print("")
+            print("--- ADMIN SYSTEM MENU ---")
+            print("(c) Clear Database")
+            print("(g) Group Students By Grade")
+            print("(p) Partition Students Into Pass/Fail")
+            print("(r) Remove A Student")
+            print("(s) Show All Students")
+            print("(b) Back to Main Menu")
+            print("(x) Exit Application")
+            choice = input("==========> Admin Select: ").strip().lower()
+
+            self.students = Database.load_all_students()
+
+            if choice == "s":
+                self.view_all_students()
+            elif choice == "p":
+                self.categorize_pass_fail()
+            elif choice == "g":
+                self.group_students() # This is the Grouping logic
+            elif choice == "r":
+                self.remove_student()
+            elif choice == "c":
+                self.clear_database()
+            elif choice == "b":
+                break
+            elif choice == "x":
+                print("Exiting application...")
+                exit()
+
+    def view_all_students(self):
+        print("")
+        print("Student List")
+        if len(self.students) == 0:
+            print("< Nothing to Display >")
+        for s in self.students:
+            print(s.name + " : " + s.id + " --> Email: " + s.email)
+
+    def categorize_pass_fail(self):
+        print("")
+        print("PASS/FAIL Partition")
+        pass_list = []
+        fail_list = []
+        for s in self.students:
+            avg = s.get_average_mark()
+            info = s.name + " (" + s.id + ")"
+            if avg >= 50:
+                pass_list.append(info)
+            else:
+                fail_list.append(info)
+        print("FAIL -> " + str(fail_list))
+        print("PASS -> " + str(pass_list))
+
+    def group_students(self):
+        print("")
+        print("Grade Grouping")
+        if len(self.students) == 0:
+            print("< Nothing to Display >")
+            return
+
+        groups = {"HD": [], "D": [], "C": [], "P": [], "Z": []}
+        temp_sub = Subject()
+        for s in self.students:
+            avg = s.get_average_mark()
+            grade = temp_sub.calculate_grades(avg)
+            groups[grade].append(
+                f"{s.name} :: {s.id} --> GRADE: {grade} - MARK: {avg:.2f}"
+            )
+        
+        order = ["HD", "D", "C", "P", "Z"]
+
+        for g in order:
+            if len(groups[g]) > 0:
+                print(f"\n{g} -->")
+                for entry in groups[g]:
+                    print("  " + entry)
+
+    def remove_student(self):
+        sid = input("Remove by ID: ")
+        found = False
+        for s in self.students:
+            if s.id == sid:
+                confirm = input("Are you sure? (y/n): ")
+                if confirm == "y":
+                    self.students.remove(s)
+                    Database.save_all_students(self.students)
+                    print("Removing Student " + sid + " Account...")
+                found = True
+                break
+        if found == False:
+            print("Student " + sid + " does not exist")
+
+    def clear_database(self):
+        confirm = input("Are you sure? (y/n): ").strip().lower()
+        if confirm == "y":
+            Database.clear_all_students()
+            print("Students data cleared")
+
+    def student_subsystem(self):
+        while True:
+            print("")
+            print("--- STUDENT SYSTEM MENU ---")
+            print("(l) Login")
+            print("(r) Register")
+            print("(b) Back to Main Menu")
+            print("(x) Exit Application")
+            choice = input("==========> Student Select: ").strip().lower()
+
+            if choice == "r":
+                self.register_student()
+            elif choice == "l":
+                logged_in = self.login_student()
+                if logged_in != None:
+                    print("")
+                    print("Student logged in successfully!")
+                    self.student_course_menu(logged_in)
+            elif choice == "b":
+                break
+            elif choice == "x":
+                print("Exiting application...")
+                exit()
+
+    def register_student(self):
+        print("")
+        print("Student Sign Up")
+
+        email = input("Email: ")
+        password = input("Password: ")
+
+        # 1: Validate format
+        if not (validate_email(email) and validate_password(password)):
+            print("Incorrect email or password format")
+            return
+
+        # 2: Check for duplicates
+        self.students = Database.load_all_students()
+        for s in self.students:
+            if s.email == email:
+                print("Student " + s.name + " already exists")
+                return
+
+        # 3: Only now show success message
+        print("Email and password formats acceptable")
+
+        name = input("Name: ")
+        new_s = Student(name, email, password)
+        self.students.append(new_s)
+        Database.save_all_students(self.students)
+
+        print("Enrolling Student " + name)
+
+    def login_student(self):
+        print("")
+        print("Student Sign In")
+        email = input("Email: ")
+        password = input("Password: ")
+        self.students = Database.load_all_students()
+        for s in self.students:
+            if s.email == email and s.password == password:
+                return s
+        print("Student does not exist")
+        return None
+
+    def student_course_menu(self, student):
+        while True:
+            print("")
+            print("--- STUDENT SUBJECT ENROLMENT MENU ---")
+            print("(c) Change Password")
+            print("(e) Enrol in a Subject (Max: 4)")
+            print("(r) Remove a Subject")
+            print("(s) Show Enroled Subjects")
+            print("(b) Back to Main Menu")
+            print("(x) Exit Application")
+            choice = input("==========> Student Select: ").strip().lower()
+
+            if choice == "e":
+                self.enrol_subject(student)
+            elif choice == "r":
+                self.remove_subject(student)
+            elif choice == "s":
+                self.view_enrolments(student)
+            elif choice == "c":
+                self.change_password(student)
+            elif choice == "b":
+                break
+            elif choice == "x":
+                print("Exiting application...")
+                exit()
+
+    def enrol_subject(self, student):
+        if len(student.subjects) >= 4:
+            print("Students are allowed to enrol in 4 subjects only")
+        else:
+            new_sub = Subject()
+            student.subjects.append(new_sub)
+            sync_student_to_file(student)
+            print("Enrolling in Subject-" + new_sub.id)
+            print("You are now enrolled in " + str(len(student.subjects)) + " out of 4 subjects")
+
+    def remove_subject(self, student):
+        sid = input("Remove Subject by ID: ")
+        found = False
+        for sub in student.subjects:
+            if sub.id == sid:
+                student.subjects.remove(sub)
+                sync_student_to_file(student)
+                print("Dropping Subject-" + sid)
+                found = True
+                break
+        if found == False:
+            print("Subject not found")
+
+    def view_enrolments(self, student):
+        print("Showing " + str(len(student.subjects)) + " subjects")
+        for sub in student.subjects:
+            print(sub)
+
+    def change_password(self, student):
+        new_p = input("New Password: ")
+        conf_p = input("Confirm Password: ")
+        if new_p == conf_p and validate_password(new_p) == True:
+            student.password = new_p
+            sync_student_to_file(student)
+            print("Password updated successfully")
+        else:
+            print("Passwords do not match or invalid format")
+
+class CLIUniApp:
     pass
 
 # ==========================================
