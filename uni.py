@@ -300,7 +300,27 @@ if __name__ == "__main__":
 
         mode = input("==========> Select option: ").strip().lower()
 
-        if mode == "x":
+        if mode == "1":
+            CLIUniApp().run()
+
+        elif mode == "2":
+            try:
+                app = GUIUniApp()
+                app.root.mainloop()
+            except:
+                print("GUI closed.")
+
+        elif mode == "3":
+            print("Generating sample data...")
+            generate_test_data()
+
+        elif mode == "4":
+            read_database()
+
+        elif mode == "5":
+            clear_database()
+
+        elif mode == "x":
             print("Exiting...")
             break
 
