@@ -272,12 +272,16 @@ class CLIUniApp:
         found = False
         for s in self.students:
             if s.id == sid:
+                found = True
                 confirm = input("Are you sure? (y/n): ").strip().lower()
                 if confirm == "y":
                     self.students.remove(s)
                     Database.save_all_students(self.students)
                     print("Removing Student " + sid + " Account...")
-                found = True
+                elif confirm == "n":
+                    print("Operation cancelled...")
+                else:
+                    print("Invalid input! Please enter y or n...")
                 break
         if not found:
             print("Student " + sid + " does not exist")
@@ -286,7 +290,11 @@ class CLIUniApp:
         confirm = input("Are you sure? (y/n): ").strip().lower()
         if confirm == "y":
             Database.clear_all_students()
-            print("Students data cleared")
+            print("Students data cleared.")
+        elif confirm == "n":
+            print("Operation cancelled...")
+        else:
+            print("Invalid input! Please enter y or n...")
 
     def student_subsystem(self):
         while True:
